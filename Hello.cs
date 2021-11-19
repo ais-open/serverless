@@ -25,10 +25,8 @@ namespace Live360.Demo
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
+            string responseMessage = $"Howdy {name ?? "Partner"}!";
+            
             return new OkObjectResult(responseMessage);
         }
     }
