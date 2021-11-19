@@ -1,47 +1,41 @@
-// Default URL for triggering event grid function in the local environment.
-// http://localhost:7071/runtime/webhooks/EventGrid?functionName={functionname}
 using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using Microsoft.Extensions.Logging;
-using System.Threading;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using System.Threading.Tasks;
+using Live360.Demo.Models;
+using Live360.Demo.Orchestration;
+using Newtonsoft.Json;
 
 namespace Live360.Demo
 {
     public static class ImageReceived
     {
-        [FunctionName("ImageReceived")]
-        public static void Run(
+        [FunctionName(nameof(ImageReceived))]
+        public static async Task Run(
             [EventGridTrigger] 
             EventGridEvent eventGridEvent,
+            [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
             dynamic data = eventGridEvent.Data;
 
             var uri = new Uri((string)data.url);
-            var image = uri.PathAndQuery;
+            var fileName = uri.PathAndQuery.Split('/')[2];
 
-            // 1) TODO: Save Input Data to Cosmos
+            // Function input comes from the request content.
+            var info = new ReceivedImageInfo
+            {
+                Id = eventGridEvent.Id,
+                FileName = fileName
+            };
 
-            // 2) Find Faces
+            string instanceId = await starter.StartNewAsync(nameof(ImageOrchestrator), info);
 
-            // Take up some memory
-            var bytes = new byte[30_000_000];
-
-            log.LogInformation("START Image: {ImageId}, {Url}", eventGridEvent.Id, uri.ToString());
-            // Simulate retrieving and processing the image
-            Thread.Sleep(Random.Shared.Next(10_000, 30_000));
-
-            // fake results
-            var faceCount = Random.Shared.Next(0, 5);
-
-            log.LogInformation("END   Image: {ImageId}, {Url} NumFaces: {FaceCount}",
-                eventGridEvent.Id, uri.ToString(), faceCount);
-
-            // 3) TODO: Save the results
-            
-            // 4) TODO: Send notifications
+            log.LogInformation("Started orchestratio for Image: {Image} with Orch ID: '{OrchestrationId}'.", 
+                JsonConvert.SerializeObject(info), instanceId);
         }
     }
 }
