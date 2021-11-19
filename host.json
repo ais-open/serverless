@@ -1,11 +1,28 @@
 {
-    "version": "2.0",
-    "logging": {
-        "applicationInsights": {
-            "samplingSettings": {
-                "isEnabled": true,
-                "excludedTypes": "Request"
-            }
-        }
+  "version": "2.0",
+  "extensions": {
+    "durableTask": {
+      "tracing": {
+        "distributedTracingEnabled": true,
+        "distributedTracingProtocol": "W3CTraceContext"
+      }
     }
+  },
+
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": false
+      },
+      "httpAutoCollectionOptions": {
+        "enableW3CDistributedTracing": true
+      }
+    },
+    "logLevel": {
+      "default": "Information",
+      "DurableTask.AzureStorage": "Error",
+      "Host.Results": "Error",
+      "Function": "Debug"
+    }
+  }
 }

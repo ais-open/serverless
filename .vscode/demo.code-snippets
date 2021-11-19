@@ -245,9 +245,79 @@
       "}"
     ]
   },
+  "Random Exception Throw": {
+    "prefix": "randex",
+    "scope": "csharp",
+    "body": "if (Random.Shared.Next(10) == 0) throw new Exception(\"Buggy Library Exception\");"
+  },
+  "Send Notification Snippet": {
+    "prefix": "send",
+    "scope": "csharp",
+    "body": [
+      "// pretend 'Hello' is an external notification API call",
+      "var hostname = Environment.GetEnvironmentVariable(\"WEBSITE_HOSTNAME\");",
+      "await httpClient.GetAsync($\"https://{hostname}/api/Hello\");"
+    ]
+  },
+  "host.json file": {
+    "prefix": "host",
+    "scope": "json",
+    "body": [
+      "{",
+      "  \"version\": \"2.0\",",
+      "  \"extensions\": {",
+      "    \"durableTask\": {",
+      "      // configure distributed tracing for durable functions",
+      "      \"tracing\": {",
+      "        \"distributedTracingEnabled\": true,",
+      "        \"distributedTracingProtocol\": \"W3CTraceContext\"",
+      "      }",
+      "    }",
+      "  },",
+      "",
+      "  \"logging\": {",
+      "    \"applicationInsights\": {",
+      "      \"samplingSettings\": {",
+      "        \"isEnabled\": false // Stop sampling so we get everything - probably not good all the time",
+      "        // typically you want this enabled and have the exclusions for things you don't want to miss",
+      "        // \"excludedTypes\": \"Request;Exception\"",
+      "      },",
+      "      \"httpAutoCollectionOptions\": {",
+      "        // enable W3C standard distributed tracing in App Insights",
+      "        \"enableW3CDistributedTracing\": true",
+      "      }",
+      "    },",
+      "    \"logLevel\": {",
+      "      // add some default log levels",
+      "      \"default\": \"Information\",",
+      "      \"DurableTask.AzureStorage\": \"Error\",",
+      "      \"Host.Results\": \"Error\",",
+      "      \"Function\": \"Debug\"",
+      "    }",
+      "  }",
+      "}",
+      ""
+    ],
+    "description": "host.json file"
+  },
   "OrchTest": {
     "prefix": "orch",
     "scope": "http",
     "body": "###\n\nGET http://localhost:7071/api/OrchTest_HttpStart HTTP/1.1\n\n###"
+  },
+  "Blob Binding": {
+    "prefix": "blob",
+    "scope": "csharp",
+    "body": "[Blob(\"images/{data.FileName}\", FileAccess.Read, Connection=\"ImagesBlobStorage\")] Stream imgStream,"
+  },
+  "blob storage setting": {
+    "prefix": "blobsetting",
+    "scope": "json",
+    "body": "\"ImagesBlobStorage__blobServiceUri\": \"https://STORAGE_ACCOUNT.blob.core.windows.net\""
+  },
+  "Add OpenApiKey setting": {
+    "prefix": "oak",
+    "scope": "csharp",
+    "body": "[OpenApiSecurity(\"function_key\", SecuritySchemeType.ApiKey, Name = \"code\", In = OpenApiSecurityLocationType.Query)]"
   }
 }
