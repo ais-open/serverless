@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using Live360.Demo.Models;
 using Microsoft.Azure.WebJobs;
@@ -19,6 +20,8 @@ namespace Live360.Demo.Orchestration
         [FunctionName(nameof(FindFaceCount))]
         public static int Run(
           [ActivityTrigger] ReceivedImageInfo input,
+          [Blob("images/{data.FileName}", FileAccess.Read, 
+             Connection="ImagesBlobStorage")] Stream imgStream,
           ILogger logger)
         {
             if (Random.Shared.Next(10) == 0) throw new Exception("Buggy Library Exception");
@@ -26,7 +29,8 @@ namespace Live360.Demo.Orchestration
             // Take up some memory
             var bytes = new byte[30_000_000];
 
-            logger.LogInformation("Finding Face Count For Image: {Image}", JsonConvert.SerializeObject(input));
+            logger.LogInformation("Finding Face Count For Image: {Image}, Size: {Size}", 
+              JsonConvert.SerializeObject(input), imgStream.Length);
 
             // Simulate retrieving and processing the image
             Thread.Sleep(Random.Shared.Next(10_000, 30_000));
